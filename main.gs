@@ -1,5 +1,11 @@
 /*
  * adds ETF menu to Google Sheets which allows to pull ETF/BPIF data from MOEX to Quotes sheet
+ * alternatively use =MOEXFINANCE() function in any cell needed
+ *
+ * API description
+ * https://habr.com/en/post/487436/
+ * https://iss.moex.com/iss/reference/
+ *
  */
 
 
@@ -40,7 +46,7 @@ function MOEXFINANCE() {
   // set api call url
   url = "https://iss.moex.com/iss/history/engines/stock/markets/shares/boards/TQTF/securities.xml?iss.meta=off"
 
-  // get xml responce
+  // get xml response
   var xml = UrlFetchApp.fetch(url, {
     muteHttpExceptions: true
   }).getContentText();
@@ -48,7 +54,7 @@ function MOEXFINANCE() {
   var root = document.getRootElement();
   var rows = root.getChildren()[0].getChildren()[0].getChildren()
 
-  // process xml responce
+  // process xml response
   var array = []
   for (var i = 0; i < rows.length; i++) {
     var secId = rows[i].getAttribute("SECID").getValue();
