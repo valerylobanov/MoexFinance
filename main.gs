@@ -6,12 +6,6 @@
  * https://habr.com/en/post/487436/
  * https://iss.moex.com/iss/reference/
  *
- * TODO:
- * 1) Get Indices from MOEX (MCFTR): https://iss.moex.com/iss/history/engines/stock/markets/index/boards/RTSI/securities/MCFTR
- * 2) Get first available quote for specified ETF
- * 
- *
- *
  */
 
 
