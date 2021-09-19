@@ -35,7 +35,7 @@ function getMoexQuotes() {
   quotes = MOEXFINANCE()
 
   // write data to sheet
-  sheet.getRange(1, 1, quotes.length, 3).setValues(quotes)
+  sheet.getRange(1, 1, quotes.length, 4).setValues(quotes)
 
 }
 
@@ -44,31 +44,36 @@ function getMoexQuotes() {
 function MOEXFINANCE() {
 
   // set api call url
-  
-  var board = ["TQTF" "TQBR"]
+
+  var board = ["TQTF", "TQBR"]
   var array = []
 
+  // api pulls max 100 pages at a time
+  // TODO: get number dynamically (there's parameter in API)
+  const maxPages = 3
   for (var j = 0; j < board.length; j++) {
-	  var url = `https://iss.moex.com/iss/history/engines/stock/markets/shares/boards/${board[j]}/securities.xml?iss.meta=off`
-	  
-	  
-	  // get xml response
-	  var xml = UrlFetchApp.fetch(url, {
-		muteHttpExceptions: true
-	  }).getContentText();
-	  var document = XmlService.parse(xml);
-	  var root = document.getRootElement();
-	  var rows = root.getChildren()[0].getChildren()[0].getChildren()
+    for (var k = 0; k < maxPages; k++) {
+      var url = `https://iss.moex.com/iss/history/engines/stock/markets/shares/boards/${board[j]}/securities.xml?iss.meta=off&start=${k * 100}`
 
-	  // process xml response
-	  for (var i = 0; i < rows.length; i++) {
-		var secId = rows[i].getAttribute("SECID").getValue();
-		var close = Number(rows[i].getAttribute("CLOSE").getValue());
-		var tradeDate = rows[i].getAttribute("TRADEDATE").getValue();
-		array.push([tradeDate, secId, close])
-	  }
 
-}	
+      // get xml response
+      var xml = UrlFetchApp.fetch(url, {
+        muteHttpExceptions: true
+      }).getContentText();
+      var document = XmlService.parse(xml);
+      var root = document.getRootElement();
+      var rows = root.getChildren()[0].getChildren()[0].getChildren()
+
+      // process xml response
+      for (var i = 0; i < rows.length; i++) {
+        var secId = rows[i].getAttribute("SECID").getValue();
+        var close = Number(rows[i].getAttribute("CLOSE").getValue());
+        var tradeDate = rows[i].getAttribute("TRADEDATE").getValue();
+        var shortName = rows[i].getAttribute("SHORTNAME").getValue();
+        array.push([tradeDate, secId, close,shortName])
+      }
+    }
+  }
 
   return array
 
