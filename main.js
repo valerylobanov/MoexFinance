@@ -1,3 +1,9 @@
+/*
+ * API description
+ * https://habr.com/en/post/487436/
+ * https://iss.moex.com/iss/reference/
+ * /
+
 /**
  * Get quote or other security data from MOEX.
  * Similar to GooglFinance formula.
@@ -26,11 +32,11 @@ function getRows(ticker, board) {
   
   var jsondata = UrlFetchApp.fetch(url);
   var object   = JSON.parse(jsondata.getContentText());
-  var res = []
   
   if(!object.history.data.length)
   return null
 
+  var res = []
   for(i=0;i<object.history.columns.length;i++) {
       res.push([object.history.columns[i],object.history.data[0][i]])
       
