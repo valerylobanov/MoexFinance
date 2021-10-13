@@ -1,80 +1,42 @@
 /*
  * adds ETF menu to Google Sheets which allows to pull ETF/BPIF data from MOEX to Quotes sheet
- * alternatively use =MOEXFINANCE() function in any cell needed
+ * alternatively use =MOEXFINANCE_ARRAY() function in any cell needed
  *
  * API description
  * https://habr.com/en/post/487436/
  * https://iss.moex.com/iss/reference/
  *
  */
+/**
+ * Get quote or other security data from MOEX.
+ * Similar to GooglFinance formula.
+ *
+ * @param {string} ticker Ticker at MOEX.
+ * @param {string} column Column to get, default = CLOSE. 
+ * Other options TRADEDATE SHORTNAME NUMTRADES VALUE OPEN LOW HIGH LEGALCLOSEPRICE WAPRICE CLOSE VOLUME MARKETPRICE2
+ * @customfunction
+ */
+ function MOEXFINANCE(ticker, column = 'CLOSE') {
 
+  // call api for shares / ETFs
+  var rows = getRows(ticker, "TQTF") // ETFs
+  if (rows.length == 0)
+    rows = getRows(ticker, "TQBR") // shares
 
-// add menu item to UI
-function onOpen() {
-  var ui = SpreadsheetApp.getUi();
-  ui.createMenu('ETF')
-    .addItem('Get MOEX quotes', 'getMoexQuotes')
-    .addToUi();
+  // convert and return
+  if (column == "CLOSE")
+    return rows
+  else
+    return rows
 }
 
-// write data to Quotes sheet
-function getMoexQuotes() {
-
-  // get current or create new Quotes sheet
-  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet()
-  var sheetName = "Quotes"
-  var sheet = spreadsheet.getSheetByName(sheetName)
-  if (!sheet) {
-    spreadsheet.insertSheet(sheetName)
-    sheet = spreadsheet.getSheetByName(sheetName)
-  } else {
-    sheet.clear()
-  }
-
-  // get quotes from MOEX
-  quotes = MOEXFINANCE()
-
-  // write data to sheet
-  sheet.getRange(1, 1, quotes.length, 4).setValues(quotes)
-
-}
-
-
-// get data from MOEX 
-function MOEXFINANCE() {
-
-  // set api call url
-
-  var board = ["TQTF", "TQBR"]
-  var array = []
-
-  // api pulls max 100 pages at a time
-  // TODO: get number dynamically (there's parameter in API)
-  const maxPages = 3
-  for (var j = 0; j < board.length; j++) {
-    for (var k = 0; k < maxPages; k++) {
-      var url = `https://iss.moex.com/iss/history/engines/stock/markets/shares/boards/${board[j]}/securities.xml?iss.meta=off&start=${k * 100}`
-
-
-      // get xml response
-      var xml = UrlFetchApp.fetch(url, {
-        muteHttpExceptions: true
-      }).getContentText();
-      var document = XmlService.parse(xml);
-      var root = document.getRootElement();
-      var rows = root.getChildren()[0].getChildren()[0].getChildren()
-
-      // process xml response
-      for (var i = 0; i < rows.length; i++) {
-        var secId = rows[i].getAttribute("SECID").getValue();
-        var close = Number(rows[i].getAttribute("CLOSE").getValue());
-        var tradeDate = rows[i].getAttribute("TRADEDATE").getValue();
-        var shortName = rows[i].getAttribute("SHORTNAME").getValue();
-        array.push([tradeDate, secId, close,shortName])
-      }
-    }
-  }
-
-  return array
-
+/*
+ * set request url for api described at https://iss.moex.com/iss/reference/817
+ * example: https://iss.moex.com/iss/history/engines/stock/markets/shares/sessions/1/boards/TQTF/securities/FXRL.json?sort_order=desc&sort_column=TRADEDATE&limit=1&iss.meta=off
+ */
+function getRows(ticker, board) {
+  var url = `https://iss.moex.com/iss/history/engines/stock/markets/shares/boards/${board}/securities/${ticker}.json?sort_order=desc&sort_column=TRADEDATE&limit=1&iss.meta=off`
+  var jsondata = UrlFetchApp.fetch(url);
+  var object   = JSON.parse(jsondata.getContentText());
+  return  object.history.data
 }
