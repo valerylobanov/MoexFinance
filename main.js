@@ -5,7 +5,6 @@
  *
  * @param {string} ticker Ticker at MOEX.
  * @param {string} date YYYY-MM-DD format, get data closest (down) to specified date. 
- * Other options TRADEDATE SHORTNAME NUMTRADES VALUE OPEN LOW HIGH LEGALCLOSEPRICE WAPRICE CLOSE VOLUME MARKETPRICE2
  * @customfunction
  */
 function MOEXFINANCE(ticker,date) {
