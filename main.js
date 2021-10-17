@@ -10,10 +10,11 @@
  * Similar to GooglFinance formula.
  *
  * @param {string} ticker Ticker at MOEX.
- * @param {string} date YYYY-MM-DD format, get data closest (down) to specified date. 
+ * @param {string} date YYYY-MM-DD format, get data closest (down) to specified date / end date fo CPI calculation
+ * @param {string} dateStart YYYY-MM-DD format, start date for CPI calculation
  * @customfunction
  */
- function MOEXFINANCE(ticker, date,dateStart) {
+ function MOEXFINANCE(ticker, date, dateStart) {
   if (ticker == "CPI:RUB")
     return fetchGksData(date,dateStart)
 
