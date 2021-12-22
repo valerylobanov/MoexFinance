@@ -4,7 +4,4 @@ Google Sheets functions to get
 - CPI data for Russia as ber CBR.ru
 
 ## To install:
-1) go to Google Sheets -> Tools -> Scripts editor
-2) copy-paste main.js content and press save
-3) give all permisions if requested by Google Sheets
-4) use MoexFinance() function as per context help
+https://drive.google.com/drive/folders/1a9apF5_x0eDQA7jjR12b9x3iDmiU1S-3?usp=sharing
